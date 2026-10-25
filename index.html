@@ -108,7 +108,7 @@ details{border-top:1px solid var(--ln);padding:8px 0}summary{cursor:pointer;font
 <section id="v-cand" hidden>
  <div class="card">
   <div class="tools"><select id="fCargo" class="b" aria-label="Filtrar cargo"></select><button class="b pri" id="cNew">+ Novo candidato</button><button class="b" id="cExp">Exportar</button><label class="b">Importar<input type="file" id="cImp" accept=".json,application/json" hidden></label><button class="b dng" id="cRes">Restaurar padrão</button></div>
-  <p class="hint" style="margin-bottom:10px">Cadastre candidatos fictícios (nome, número, gênero e foto). Eles aparecem na urna quando o número é digitado. Presidente, Governador e Prefeito têm campos de vice.</p>
+  <p class="hint" style="margin-bottom:10px">Cadastre candidatos (nome, número, gênero e foto). Eles aparecem na urna quando o número é digitado. Presidente, Governador e Prefeito têm campos de vice.</p>
   <div class="grade" id="cGrade"></div>
  </div>
 </section>
@@ -201,12 +201,23 @@ const SEED=()=>[
  {cargo:'DEP_ESTADUAL',numero:'94001',partido:'94',nome:'Maomao',genero:'feminino',foto:P.maomao},
  {cargo:'SEN1',numero:'969',partido:'96',nome:'Yumeko Jabami',genero:'feminino',foto:P.yumeko},
  {cargo:'SEN2',numero:'333',partido:'90',nome:'Serena',genero:'feminino',foto:P.serena},
- {cargo:'GOVERNADOR',numero:'66',partido:'99',nome:'Goku',genero:'masculino',foto:P.goku,vice:{nome:'Vegeta',genero:'masculino',foto:P.vegeta}},
- {cargo:'PRESIDENTE',numero:'11',partido:'11',nome:'Seiya de Pégaso',genero:'masculino',foto:P.seiya,vice:{nome:'Shiryu de Dragão',genero:'masculino',foto:P.shiryu}}
+ {cargo:'GOVERNADOR',numero:'55',partido:'55',nome:'Omar Aziz (PSD)',genero:'masculino',foto:'governo 55 - omar.png',vice:{nome:'Alessandra Campelo (PSD)',genero:'feminino',foto:'governo 55 vice - alessandra.png'}},
+ {cargo:'PRESIDENTE',numero:'22',partido:'22',nome:'Flávio Bolsonaro (PL)',genero:'masculino',foto:'presidente 22 - flavio.png',vice:{nome:'Alfredo Gaspar (PL)',genero:'masculino',foto:'presidente 22 vice - alfredo.png'}},
+ {cargo:'GOVERNADOR',numero:'22',partido:'22',nome:'Professora Maria do Carmo (PL)',genero:'feminino',foto:'governo 22 - maria do carmo.png',vice:{nome:'Coronel Aníbal (PL)',genero:'masculino',foto:'governo 22 vice - coronel anibal.png'}},
+ {cargo:'PRESIDENTE',numero:'13',partido:'13',nome:'Lula (PT)',genero:'masculino',foto:'presidente 13 - lula.png',vice:{nome:'Geraldo Alckmin (PSB)',genero:'masculino',foto:'presidente 13 vice - geraldo.png'}}
 ].map((c,i)=>({id:'s'+i,...c}));
 const CFG0={preset:'g1',dist:false,mun:'00003 - Município com Digitais e Fotos',zona:'0003',secao:'0009',som:true,vol:.6,tkey:'',tconf:'',tfim:''};
 let D;try{D=JSON.parse(localStorage.getItem('urna-v1'))}catch{}
 if(!D||!Array.isArray(D.cands))D={cands:SEED(),cfg:{...CFG0}};D.cfg={...CFG0,...D.cfg};
+const govAntigo=D.cands.find(c=>c.id=='s6'&&c.nome=='Goku');
+const presAntigo=D.cands.find(c=>c.id=='s7'&&c.nome=='Seiya de Pégaso');
+if(govAntigo)Object.assign(govAntigo,{cargo:'GOVERNADOR',numero:'55',partido:'55',nome:'Omar Aziz (PSD)',genero:'masculino',foto:'governo 55 - omar.png',vice:{nome:'Alessandra Campelo (PSD)',genero:'feminino',foto:'governo 55 vice - alessandra.png'}});
+if(presAntigo)Object.assign(presAntigo,{cargo:'PRESIDENTE',numero:'22',partido:'22',nome:'Flávio Bolsonaro (PL)',genero:'masculino',foto:'presidente 22 - flavio.png',vice:{nome:'Alfredo Gaspar (PL)',genero:'masculino',foto:'presidente 22 vice - alfredo.png'}});
+if(govAntigo||presAntigo){
+ if(!D.cands.some(c=>c.cargo=='GOVERNADOR'&&c.numero=='22'))D.cands.push({id:'u-gov-22',cargo:'GOVERNADOR',numero:'22',partido:'22',nome:'Professora Maria do Carmo (PL)',genero:'feminino',foto:'governo 22 - maria do carmo.png',vice:{nome:'Coronel Aníbal (PL)',genero:'masculino',foto:'governo 22 vice - coronel anibal.png'}});
+ if(!D.cands.some(c=>c.cargo=='PRESIDENTE'&&c.numero=='13'))D.cands.push({id:'u-pres-13',cargo:'PRESIDENTE',numero:'13',partido:'13',nome:'Lula (PT)',genero:'masculino',foto:'presidente 13 - lula.png',vice:{nome:'Geraldo Alckmin (PSB)',genero:'masculino',foto:'presidente 13 vice - geraldo.png'}});
+ try{localStorage.setItem('urna-v1',JSON.stringify(D))}catch{}
+}
 let tt;function toast(m){const e=$('#toast');e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,2800)}
 const save=()=>{try{localStorage.setItem('urna-v1',JSON.stringify(D));return true}catch{toast('Sem espaço para salvar (fotos/sons muito grandes).');return false}};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
